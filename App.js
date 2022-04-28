@@ -1,13 +1,6 @@
-const express = require('express')
-
-const app = express()
 require('dotenv').config();
+const Server = require('./models/server');
 
-//Servir consenido estatico
-app.use(express.static('public'))
+const server = new Server();
 
-app.get('/', function (req, res) {
-  res.send('Hello World')
-})
-
-app.listen(8080)
+server.listen();
