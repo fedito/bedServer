@@ -1,20 +1,61 @@
 const { response, request } = require("express");
+const Bed = require("../models/bed");
 
-const bedsGet = (req = request, res = response) => {
-  
-    const bed = req.params.bed;
+const getBed = async (req = request, res = response) => {
+  const { id } = req.params;
 
-    const queryParams = req.query
+  const bed = await Bed.findByPk(id);
 
-  res.json("Hello World");
+  if (!bed) {
+    throw new Error();
+  }
+
+  res.json(bed);
 };
-const bedsPost = (req = request, res = response) => {
-  const body = req.body;
 
-  res.json("Hello World");
+const postBed = async (req = request, res = response) => {
+  const { body } = req;
+
+  const bed = await Bed.create(body);
+
+  res.json(bed);
+};
+
+const putBed = async (req = request, res = response) => {
+  const { id } = req.params;
+
+  const { body } = req;
+
+  const bed = await Bed.findByPk(id);
+
+  if (!bed) {
+    throw new Error();
+  }
+
+  bed.set(body);
+
+  await bed.save();
+
+  res.json(bed);
+};
+
+const deleteBed = async (req = request, res = response) => {
+  const { id } = req.params;
+
+  const bed = await Bed.findByPk(id);
+
+  if (!bed) {
+    throw new Error();
+  }
+
+  bed.destroy();
+
+  res.json(bed);
 };
 
 module.exports = {
-  bedsGet,
-  bedsPost,
+  getBed,
+  postBed,
+  putBed,
+  deleteBed
 };
