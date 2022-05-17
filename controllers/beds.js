@@ -1,13 +1,14 @@
 const { response, request } = require("express");
 const Bed = require("../models/bed");
 
-const getBed = async (req = request, res = response) => {
+const getBed = async (req = request, res = response, next) => {
   const { id } = req.params;
 
   const bed = await Bed.findByPk(id);
 
   if (!bed) {
-    throw new Error();
+    return next(new ErrorException(ErrorCode.NotFound));
+
   }
 
   res.json(bed);
@@ -21,7 +22,7 @@ const postBed = async (req = request, res = response) => {
   res.json(bed);
 };
 
-const putBed = async (req = request, res = response) => {
+const putBed = async (req = request, res = response, next) => {
   const { id } = req.params;
 
   const { body } = req;
@@ -29,7 +30,7 @@ const putBed = async (req = request, res = response) => {
   const bed = await Bed.findByPk(id);
 
   if (!bed) {
-    throw new Error();
+    return next(new ErrorException(ErrorCode.NotFound));
   }
 
   bed.set(body);
@@ -39,13 +40,13 @@ const putBed = async (req = request, res = response) => {
   res.json(bed);
 };
 
-const deleteBed = async (req = request, res = response) => {
+const deleteBed = async (req = request, res = response, next) => {
   const { id } = req.params;
 
   const bed = await Bed.findByPk(id);
 
   if (!bed) {
-    throw new Error();
+    return next(new ErrorException(ErrorCode.NotFound));
   }
 
   bed.destroy();
@@ -57,5 +58,5 @@ module.exports = {
   getBed,
   postBed,
   putBed,
-  deleteBed
+  deleteBed,
 };

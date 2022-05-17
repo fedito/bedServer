@@ -1,14 +1,23 @@
 const { response, request } = require("express");
+const ErrorCode = require("../error-handler/errorCode");
+const ErrorException = require("../error-handler/errorException");
+const Bed = require("../models/bed");
 const Room = require("../models/room");
 
 
-const getRoom = async (req = request, res = response) => {
+const getRoom = async (req = request, res = response, next) => {
   const { id } = req.params;
 
-  const room = await Room.findByPk(id)
+  const room = await Room.findByPk(id, {
+    include: [
+      {
+        model: Bed,
+      },
+    ],
+  })
 
   if (!room) {
-    throw new Error();
+    return next(new ErrorException(ErrorCode.NotFound));
   }
 
   res.json(room);
@@ -22,7 +31,7 @@ const postRoom = async (req = request, res = response) => {
   res.json(room);
 };
 
-const putRoom = async (req = request, res = response) => {
+const putRoom = async (req = request, res = response, next) => {
   const { id } = req.params;
 
   const { body } = req;
@@ -30,7 +39,7 @@ const putRoom = async (req = request, res = response) => {
   const room = await Room.findByPk(id);
 
   if (!room) {
-    throw new Error();
+    return next(new ErrorException(ErrorCode.NotFound));
   }
 
   room.set(body);
@@ -40,13 +49,13 @@ const putRoom = async (req = request, res = response) => {
   res.json(room);
 };
 
-const deleteRoom = async (req = request, res = response) => {
+const deleteRoom = async (req = request, res = response, next) => {
   const { id } = req.params;
 
   const room = await Room.findByPk(id);
 
   if (!room) {
-    throw new Error();
+    return next(new ErrorException(ErrorCode.NotFound));
   }
 
   room.destroy();

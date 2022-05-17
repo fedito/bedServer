@@ -1,14 +1,29 @@
 const { response, request } = require("express");
+const ErrorCode = require("../error-handler/errorCode");
+const ErrorException = require("../error-handler/errorException");
+const Floor = require("../models/floor");
 const Hospital = require("../models/hospital");
 
+const getHospitals = async (req = request, res = response) => {
+  const hospitals = await Hospital.findAll();
+  res.json(hospitals);
+};
 
 const getHospital = async (req = request, res = response) => {
   const { id } = req.params;
 
-  const hospital = await Hospital.findByPk(id)
+  const hospital = await Hospital.findByPk(id, {
+    include: [
+      {
+        model: Floor,
+      },
+    ],
+  });
+
+  console.log(hospital);
 
   if (!hospital) {
-    throw new Error();
+    return next(new ErrorException(ErrorCode.NotFound)) 
   }
 
   res.json(hospital);
@@ -30,7 +45,7 @@ const putHospital = async (req = request, res = response) => {
   const hospital = await Hospital.findByPk(id);
 
   if (!hospital) {
-    throw new Error();
+    return next(new ErrorException(ErrorCode.NotFound)) 
   }
 
   hospital.set(body);
@@ -46,7 +61,7 @@ const deleteHospital = async (req = request, res = response) => {
   const hospital = await Hospital.findByPk(id);
 
   if (!hospital) {
-    throw new Error();
+    return next(new ErrorException(ErrorCode.NotFound)) 
   }
 
   hospital.destroy();
@@ -55,8 +70,9 @@ const deleteHospital = async (req = request, res = response) => {
 };
 
 module.exports = {
+  getHospitals,
   getHospital,
   postHospital,
   putHospital,
-  deleteHospital
+  deleteHospital,
 };

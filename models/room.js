@@ -1,7 +1,6 @@
-const { DataTypes } = require("sequelize/types");
+const { DataTypes } = require("sequelize");
 const { db } = require("../database/connection");
-const { Bed } = require("./bed");
-const { Hospital } = require("./hospital");
+const Bed = require("./bed");
 
 const Room = db.define(
   "Room",
@@ -19,7 +18,7 @@ const Room = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    hospitalId: {
+    floorId: {
       type: DataTypes.INTEGER,
     },
   },
@@ -31,6 +30,6 @@ const Room = db.define(
 Room.hasMany(Bed, {
   foreignKey: "roomId",
 });
-Room.belongsTo(Hospital);
+// Room.belongsTo(Hospital);
 
 module.exports = Room;

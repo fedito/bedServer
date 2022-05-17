@@ -1,6 +1,6 @@
-const { DataTypes } = require("sequelize/types");
+const { DataTypes } = require("sequelize");
 const { db } = require("../database/connection");
-const { Room } = require("./room");
+const Room = require("./room");
 
 const Bed = db.define(
   "Bed",
@@ -44,6 +44,6 @@ const Bed = db.define(
   }
 );
 
-Bed.belongsTo(Room);
+// Bed.belongsTo(Room);
 
 module.exports = Bed;

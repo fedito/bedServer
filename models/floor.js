@@ -1,9 +1,9 @@
 const { DataTypes } = require("sequelize");
 const { db } = require("../database/connection");
-const Floor = require("./floor");
+const Room = require("./room");
 
-const Hospital = db.define(
-  "Hospital",
+const Floor = db.define(
+  "Floor",
   {
     id: {
       primaryKey: true,
@@ -11,6 +11,12 @@ const Hospital = db.define(
       autoIncrement: true,
     },
     name: {
+      type: DataTypes.STRING,
+    },
+    type: {
+      type: DataTypes.STRING,
+    },
+    hospitalId: {
       type: DataTypes.INTEGER,
     },
   },
@@ -19,8 +25,8 @@ const Hospital = db.define(
   }
 );
 
-Hospital.hasMany(Floor, {
-  foreignKey: "hospitalId",
+Floor.hasMany(Room, {
+  foreignKey: "floorId",
 });
 
-module.exports = Hospital;
+module.exports = Floor;

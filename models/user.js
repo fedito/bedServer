@@ -1,5 +1,6 @@
-const { DataTypes } = require("sequelize/types");
+const { DataTypes } = require("sequelize");
 const { db } = require("../database/connection");
+const Hospital = require("./hospital");
 
 const User = db.define(
   "User",
@@ -21,14 +22,17 @@ const User = db.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    enabled: {
-      type: DataTypes.BOOLEAN,
+    hospitalId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },
   {
     underscored: true,
+    paranoid: true
   }
 );
+
+User.belongsTo(Hospital)
 
 module.exports = User;

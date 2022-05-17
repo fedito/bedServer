@@ -1,13 +1,17 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const { db } = require("../database/connection");
+const errorHandler = require("../error-handler/errorHandler");
 
 class Server {
   constructor() {
     this.app = express();
     this.port = process.env.PORT;
     this.authPath = "/api/auth";
+    this.hospitalsPath = "/api/hospitals";
+    this.floorsPath = "/api/floors";
+    this.roomsPath = "/api/rooms";
     this.bedsPath = "/api/beds";
 
     //DB connection
@@ -18,6 +22,9 @@ class Server {
 
     //Routes
     this.routes();
+
+    //Error handler
+    this.errors()
   }
 
   async connectDB() {
@@ -44,7 +51,14 @@ class Server {
 
   routes() {
     this.app.use(this.authPath, require("../routes/auth"));
+    this.app.use(this.hospitalsPath, require("../routes/hospital"));
+    this.app.use(this.floorsPath, require("../routes/floor"));
+    this.app.use(this.roomsPath, require("../routes/room"));
     this.app.use(this.bedsPath, require("../routes/bed"));
+  }
+
+  errors() {
+    this.app.use(errorHandler)
   }
 
   listen() {

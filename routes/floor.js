@@ -1,18 +1,19 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
-const { getRoom, postRoom, putRoom, deleteRoom } = require("../controllers/rooms");
+const { getFloor, postFloor, putFloor, deleteFloor } = require("../controllers/floors");
 
 const {} = require('../middlewares')
 
 const router = Router();
 
-router.get("/:id", [], getRoom)
+router.get("/:id",[], getFloor)
 
-router.post("/", [], postRoom)
+router.post("/", [], postFloor)
 
-router.put("/:id", [], putRoom)
+router.put("/:id", [], putFloor)
 
-router.delete("/id", [], deleteRoom)
+router.post("/beds",[check('dni', 'DNI ')] , deleteFloor);
+
 //en el check() se puede usar el metodo .custom() donde paso una funcion que puedo utilizar
 
 module.exports = router;

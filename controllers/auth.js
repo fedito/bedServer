@@ -1,19 +1,22 @@
 const bcryptjs = require("bcryptjs");
 const { response, request } = require("express");
+const ErrorCode = require("../error-handler/errorCode");
+const ErrorException = require("../error-handler/errorException");
 const { generateJWT } = require("../helpers/generateJWT");
+const Hospital = require("../models/hospital");
 const User = require("../models/user");
 
-const login = async (req = request, res = response) => {
+const login = async (req = request, res = response, next) => {
   const { dni, password } = req.body;
 
-  const user = await User.findOne({ where: { dni, enabled: true } });
+  const user = await User.findOne({ where: { dni } });
 
   if (!user) {
     throw new Error();
   }
 
-  if (bcryptjs.compareSync(password, user.password)) {
-    throw new Error();
+  if (!bcryptjs.compareSync(password, user.password)) {
+    return next(new ErrorException(ErrorCode.WrongPassword)) 
   }
 
   const token = await generateJWT(user.id);
@@ -21,15 +24,18 @@ const login = async (req = request, res = response) => {
   res.json({ user, token });
 };
 
-const register = async (req = request, res = response) => {
-  const { dni, password, role } = req.body;
+const register = async (req = request, res = response, next) => {
+  const { dni, password, role, hospitalId } = req.body;
 
   const user = await User.findOne({ where: { dni } });
 
   if (user) {
-    if (!user.enabled) {
-      throw new Error();
-    }
+    return next(new ErrorException(ErrorCode.UserAlreadyExists)) 
+  }
+
+  const hospital = await Hospital.findByPk(hospitalId);
+
+  if(!hospital) {
     throw new Error();
   }
 
@@ -39,7 +45,7 @@ const register = async (req = request, res = response) => {
     dni,
     password: hashedPassword,
     role,
-    enabled: true,
+    hospitalId
   });
 
   res.json(newUser);
@@ -52,15 +58,11 @@ const logout = async (req = request, res = response) => {
 const deleteUser = async (req = request, res = response) => {
   const { dni } = req.body;
 
-  const user = await User.findOne({ where: { dni, enabled: true } });
+  const user = await User.destroy({ where: { dni } });
 
   if (!user) {
     throw new Error();
   }
-
-  user.set({ enabled: false });
-
-  await user.save();
 
   res.json(user);
 };
@@ -68,15 +70,11 @@ const deleteUser = async (req = request, res = response) => {
 const restoreUser = async (req = request, res = response) => {
   const { dni } = req.body;
 
-  const user = await User.findOne({ where: { dni, enabled: false } });
+  const user = await User.restore({ where: { dni } });
 
   if (!user) {
     throw new Error();
   }
-
-  user.set({ enabled: true });
-
-  await user.save();
 
   res.json(user);
 };
